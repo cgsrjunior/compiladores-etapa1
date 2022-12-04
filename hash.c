@@ -1,92 +1,81 @@
 #include "hash.h"
 #include "tokens.h"
-#include <stdio.h>
+#include <string.h>
 
-int index = hash_function(key);
-
-unsigned long hash_function(char* str) {
-    unsigned long i = 0;
-    for (int j=0; str[j]; j++)
-        i += str[j];
-    return i % CAPACITY;
+void initMe(void) {
+	int i=0;
+	for(i=0; i<HASH_CAPACITY; i++){
+		HashTable[i] = 0;
+	}
 }
 
-
-Ht_item* create_item(int* token, char* value) {
-    // Creates a pointer to a new hash table item
-    Ht_item* item = (Ht_item*) malloc (sizeof(Ht_item));
-    item->type = (int*) malloc (strlen(token) + 1);
-    item->value = (char*) malloc (strlen(value) + 1);
-    
-    strcpy(item->type, token);
-    strcpy(item->value, value);
-
-    return item;
-}
-
-HashTable* create_table(int size) {
-    // Creates a new HashTable
-    HashTable* table = (HashTable*) malloc (sizeof(HashTable));
-    table->size = size;
-    table->count = 0;
-    table->items = (Ht_item**) calloc (table->size, sizeof(Ht_item*));
-    for (int i=0; i<table->size; i++)
-// It's supposed to be null
-        table->items[i] = NULL;
-
-    return table;
-}
-
-void free_item(Ht_item* item) {
-    // Frees an item
-    free(item->type);
-    free(item->value);
-    free(item);
-}
-
-void free_table(HashTable* table) {
-    // Frees the table
-    for (int i=0; i<table->size; i++) {
-        Ht_item* item = table->items[i];
-        if (item != NULL)
-            free_item(item);
-    }
-
-    free(table->items);
-    free(table);
-}
-
-void ht_insert(HashTable* table, int* token, char* value) {
-	// Create the item
-	Ht_item* item = create_item(token, value);
-
-	Ht_item* current_item = table->items[index];
+int hashAddress(char *lit) {
+	int address = 1;
+	int i;
 	
-	if (current_item == NULL) {
-	    // Key does not exist.
-	    if (table->count == table->size) {
-	        // Hash Table Full
-	        printf("Insert Error: Hash Table is full\n");
-	        return;
-	    }
-	    
-	    // Insert directly
-	    table->items[index] = item; 
-	    table->count++;
+	for (i=0; i<strlen(lit); i++){
+		address = (address * lit[i]) % HASH_CAPACITY +1;
 	}
 
-	else {
-    		// Scenario 1: We only need to update value
-    		if (strcmp(current_item->key, key) == 0) {
-        		strcpy(table->items[index]->value, value);
-        		return;
-    		}
-    
-    	else {
-			// Scenario 2: Collision
-		  	// We will handle case this a bit later
-          	handle_collision(table, item);
-          	return;
-    	}
+	return address-1;
+}
+
+hashNode* hashFind(char *lit, int address){
+	hashNode *node;
+	for(node=HashTable[address]; node; node=node->next)
+		if(strcmp(node->lit, lit) == 0)
+			return node;
+
+	return 0;
+}
+
+hashNode* hashInsert(int type, char *lit){
+	hashNode *newNode;
+	int address = hashAddress(lit);
+
+	lit = trimQuotation(type, lit);
+
+	if((newNode = hashFind(lit, address))!=0)
+		return newNode;	
+
+	newNode = (hashNode *) calloc(1, sizeof(hashNode));
+	newNode->type = type;
+	newNode->lit = calloc(strlen(yytext)+1, sizeof(char));
+
+	strcpy(newNode->lit, lit);
+
+	newNode->next = HashTable[address];
+	HashTable[address] = newNode;
+
+	return newNode;
+}
+
+void hashPrint(){
+	int i=0;
+	hashNode *node;
+	
+	for(i=0; i<HASH_CAPACITY; i++)
+		for(node = HashTable[i]; node!=0; node=node->next)
+			printf("Hash_Table_Node[%d]: %s  -> %i \n", i, node->lit, node->type);
+
+}
+
+
+//Auxiliar function to transform into LITERAL
+
+char* trimQuotation(int type, char* lit){
+	char *trimmedLit;
+
+	trimmedLit = calloc(strlen(lit-1), sizeof(char));
+
+	if(type == LIT_CHAR){
+		
+		strncpy(trimmedLit, &lit[1], 1);
+	}else if(type == LIT_STRING){
+
+		trimmedLit = strtok(lit, "\"");
+	}else{
+		return lit;
 	}
+	return trimmedLit;
 }

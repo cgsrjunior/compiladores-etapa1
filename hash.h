@@ -1,34 +1,19 @@
+#define HASH_CAPACITY 1000
 
-#define CAPACITY 50000 // Size of the Hash Table
-
-typedef struct Ht_item Ht_item;
-
-typedef struct HashTable HashTable;
-
-// Define the Hash Table Item here
-struct Ht_item {
-    int   type;
-    char* value;
-    Ht_item* next;
-};
-
-// Define the Hash Table here
-struct HashTable {
-    // Contains an array of pointers
-    // to items
-    Ht_item** items;
-    int size;
-    int count;
-};
+typedef struct hashnode hashNode;
+typedef struct hashnode{
+	int type;	
+	char *lit;
+	hashNode *next;
+}hashNode;
 
 
-// Hash prototype functions here
-Ht_item* create_item(int* token, char* value);
+hashNode *HashTable[HASH_CAPACITY];
 
-HashTable* create_table(int size);
+extern char *yytext;
 
-void free_item(Ht_item* item);
-
-void free_table(HashTable* table);
-
-void ht_insert(HashTable* table, int* token, char* value);
+void initMe(void);
+int hashAddress(char *lit);
+hashNode* hashInsert(int type, char *lit);
+void hashPrint(void);
+hashNode* hashFind(char *lit, int address);
