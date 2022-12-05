@@ -2,13 +2,14 @@
 #include <stdlib.h>
 #include "hash.h"
 #include "tokens.h"
+#include "func.h"
 
 extern int yylex();
 extern char *yytext;
 extern FILE *yyin;
 
-int isRunning();
-int getLineNumber();
+//int getLineNumber();
+//int is_running();
 //void printLineNumber();
 
 int main(int argc, char** argv){
@@ -17,7 +18,7 @@ int main(int argc, char** argv){
 	initMe();
 
 	if(argc < 2){
-		printf("Use o comando: ./etapa1 input.txt \n");
+		printf("Comando invalido. Tente: ./etapa1 input.txt \n");
 		exit(1);	
 	}
 	
@@ -26,7 +27,7 @@ int main(int argc, char** argv){
 		exit(1);
 	}
 	int line = 0;
-	while(isRunning()){
+	while(is_running()){
 		tok = yylex();
 		if(line != getLineNumber()){
 			line = getLineNumber();

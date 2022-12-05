@@ -1,22 +1,26 @@
 %{
 #include "tokens.h"
+#include "hash.h"
+#include "func.h"
 
 
-int running_status = 1, lines = 1;
-int words = 0, c_letters = 0, numbers = 0, spl_char = 0, total = 0;
+int Running = 1;
+int Lines = 1;
+
+
+int getLineNumber();
+int is_running();
+void printLineNumber();
 
 
 %}
 
-TOKEN_ID      [a-z_\-]+
+TOKEN_ID      [a-z0-9_]+
 SPECIAL [-,;:\(\)\[\]\{\}+*/<>=]
 CHAR    '[^']'
 STRING  \"[^"\n]*\"
 INT     [0-9]+
 FLOAT   [0-9]*[.][0-9]+$
-
-MULTI_COMMENTARY_BEGIN [///]
-MULTI_COMMENTARY_END   [\\\]
 
 
 %option nounput
@@ -35,7 +39,7 @@ MULTI_COMMENTARY_END   [\\\]
 "while"         return KW_ENQUANTO;
 "input"         return KW_ENTRADA;
 "write"         return KW_ESCREVA;
-"return"        return KW_RETORNA;
+"return"        return KW_RETORNE;
 
 "<="			return OPERATOR_LE;
 ">="			return OPERATOR_GE;
@@ -43,13 +47,13 @@ MULTI_COMMENTARY_END   [\\\]
 "!="			return OPERATOR_DIF;
 
 
-[\n]        {lines++;}
+[\n]        {Lines++;}
 [\t]        {/* Do nothing */ }
 
 
 {SPECIAL}   {/* Returns only the ASCII character needed */ return yytext[0];}
 
-{INT}       { hashInsert(LIT_INTEGER, yytext);   return LIT_INTEGER; }
+{INT}       { hashInsert(LIT_INTEIRO, yytext);   return LIT_INTEIRO; }
 {FLOAT}     { hashInsert(LIT_FLOAT, yytext);     return LIT_FLOAT;   }
 {CHAR}      { hashInsert(LIT_CHAR, yytext);      return LIT_CHAR;    }
 {STRING}    { hashInsert(LIT_STRING, yytext);    return LIT_STRING;  }
@@ -58,41 +62,29 @@ MULTI_COMMENTARY_END   [\\\]
 
 .           { return TOKEN_ERROR; }
 
-"//".*                                    { /* Comentario de linha unica -> ignora */ }
-
-{MULTI_COMMENT_BEGIN}           { BEGIN(COMMENT); }
-<COMMENT>"///"                  { BEGIN(INITIAL); }
-<COMMENT>"\n"                   { line_count++; }
+"///"                            { BEGIN(COMMENT); }
+<COMMENT>"\n"                    { Lines++; }
 <COMMENT>.
-{MULTI_COMMENT_END}.*
+<COMMENT>"\\\\\\"                { BEGIN(INITIAL); }
+
+"//".*                          { /* Do nothing */ }
 
 
 %%
 
-int main()
-{
-    yylex();
-}
 
-int getLineNumber() {
-    return lines;
-}
-
-int is_running()
-{
-    return running_status;
-}
-
-/* This function is going to be used to append the id and used to convert the ascii value */
+/*
+ This function is going to be used to append the id and used to convert the ascii value
 void addto_buf()
 {
     cur_tok=strlen(buf);
-    strcpy(buf+cur_tok, yytext); /* append to buffer */
-} 
+    strcpy(buf+cur_tok, yytext); 
+}
+It didn`t work
+ */
 
 int yywrap()
 {
-    running_status = 0;
-    yylex_destroy();
+    Running = 0;
     return 1;
 }

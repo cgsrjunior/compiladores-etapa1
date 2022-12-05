@@ -1,2 +1,21 @@
 criei este arquivo para testar aquilo que fiz
 Ola mundo
+int number = 1;
+///
+Aqui
+comentei a declaracao
+de um real
+\\\
+float real = 2.0;
+// test
+char letra = 'a';
+while(1)
+    printf("Que bonita sua roupa");
+    break;
+if (number == 1 && number != 2 && number <=1 && number >= 1)\
+    write("Batata quente");
+else
+    read;
+///
+Comentario
+Incompleto

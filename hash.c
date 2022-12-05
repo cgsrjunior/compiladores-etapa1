@@ -1,6 +1,9 @@
 #include "hash.h"
 #include "tokens.h"
+#include "func.h"
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 void initMe(void) {
 	int i=0;
@@ -58,24 +61,4 @@ void hashPrint(){
 		for(node = HashTable[i]; node!=0; node=node->next)
 			printf("Hash_Table_Node[%d]: %s  -> %i \n", i, node->lit, node->type);
 
-}
-
-
-//Auxiliar function to transform into LITERAL
-
-char* trimQuotation(int type, char* lit){
-	char *trimmedLit;
-
-	trimmedLit = calloc(strlen(lit-1), sizeof(char));
-
-	if(type == LIT_CHAR){
-		
-		strncpy(trimmedLit, &lit[1], 1);
-	}else if(type == LIT_STRING){
-
-		trimmedLit = strtok(lit, "\"");
-	}else{
-		return lit;
-	}
-	return trimmedLit;
 }
