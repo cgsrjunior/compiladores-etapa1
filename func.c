@@ -8,7 +8,7 @@ int getLineNumber(){
 	return Lines;
 }
 
-int is_running()
+int isRunning()
 {
     return Running;
 }

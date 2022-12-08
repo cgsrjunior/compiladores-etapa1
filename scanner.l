@@ -9,7 +9,7 @@ int Lines = 1;
 
 
 int getLineNumber();
-int is_running();
+int isRunning();
 void printLineNumber();
 
 

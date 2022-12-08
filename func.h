@@ -4,6 +4,6 @@ extern int Running;
 extern int Lines;
 
 int getLineNumber();
-int is_running();
+int isRunning();
 void printLineNumber();
 char* trimQuotation(int type, char* lit);

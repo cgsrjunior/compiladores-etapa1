@@ -27,7 +27,7 @@ int main(int argc, char** argv){
 		exit(1);
 	}
 	int line = 0;
-	while(is_running()){
+	while(isRunning()){
 		tok = yylex();
 		if(line != getLineNumber()){
 			line = getLineNumber();
